@@ -53,8 +53,9 @@ class StringReader:
     def is_allowed_number(self, char):
         return char >= '0' and char <= '9' or char == '.' or char == '-'
     
-    def is_quoted_string_start(self, char):
-        return char == self.SYNTAX_DOUBLE_QUOTE or char == self.SYNTAX_SINGLE_QUOTE
+    @classmethod
+    def is_quoted_string_start(cls, char):
+        return char == cls.SYNTAX_DOUBLE_QUOTE or char == cls.SYNTAX_SINGLE_QUOTE
     
     def skip_whitespace(self):
         while self.can_read() and self.peek() in string.whitespace:
