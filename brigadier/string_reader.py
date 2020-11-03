@@ -1,4 +1,5 @@
 import string
+import struct
 from brigadier.exceptions import BuiltInExceptions
 
 class StringReader:
@@ -69,42 +70,55 @@ class StringReader:
             raise BuiltInExceptions.reader_expected_int().create_with_context(self)
         
         try:
-            return int(number)
+            result = int(number)
         except ValueError:
             self.cursor = start
             raise BuiltInExceptions.reader_invalid_int().create_with_context(self, number)
         
-    # def read_long(self):
-    #     # TODO: verify long
-    #     start = self.cursor
-    #     while self.can_read() and self.is_allowed_number(self.peek()):
-    #         self.skip()
+        if result != struct.unpack(">i", struct.pack(">i", result)):
+            self.cursor = start
+            raise BuiltInExceptions.reader_invalid_int().create_with_context(self, number)
+        return result
         
-    #     number = self.string[start:self.cursor]
-    #     if not number:
-    #         raise BuiltInExceptions.reader_expected_long().create_with_context(self)
+    def read_long(self):
+        start = self.cursor
+        while self.can_read() and self.is_allowed_number(self.peek()):
+            self.skip()
+        
+        number = self.string[start:self.cursor]
+        if not number:
+            raise BuiltInExceptions.reader_expected_long().create_with_context(self)
+        
+        try:
+            result = int(number)
+        except ValueError:
+            self.cursor = start
+            raise BuiltInExceptions.reader_invalid_long().create_with_context(self, number)
+        
+        if result != struct.unpack(">q", struct.pack(">q", result)):
+            self.cursor = start
+            raise BuiltInExceptions.reader_invalid_long().create_with_context(self, number)
+        return result
 
-    #     try:
-    #         return int(number)
-    #     except ValueError:
-    #         self.cursor = start
-    #         raise BuiltInExceptions.reader_invalid_long().create_with_context(self, number)
-
-    # def read_double(self):
-    #     # TODO: verify double
-    #     start = self.cursor
-    #     while self.can_read() and self.is_allowed_number(self.peek()):
-    #         self.skip()
+    def read_double(self):
+        start = self.cursor
+        while self.can_read() and self.is_allowed_number(self.peek()):
+            self.skip()
         
-    #     number = self.string[start:self.cursor]
-    #     if not number:
-    #         raise BuiltInExceptions.reader_expected_double().create_with_context(self)
+        number = self.string[start:self.cursor]
+        if not number:
+            raise BuiltInExceptions.reader_expected_double().create_with_context(self)
         
-    #     try:
-    #         return float(number)
-    #     except ValueError:
-    #         self.cursor = start
-    #         raise BuiltInExceptions.reader_invalid_double().create_with_context(self, number)
+        try:
+            result = float(number)
+        except ValueError:
+            self.cursor = start
+            raise BuiltInExceptions.reader_invalid_double().create_with_context(self, number)
+        
+        if result != struct.unpack(">d", struct.pack(">d", result)):
+            self.cursor = start
+            raise BuiltInExceptions.reader_invalid_double().create_with_context(self, number)
+        return result
     
     def read_float(self):
         start = self.cursor
@@ -116,10 +130,15 @@ class StringReader:
             raise BuiltInExceptions.reader_expected_float().create_with_context(self)
         
         try:
-            return float(number)
+            result = float(number)
         except ValueError:
             self.cursor = start
             raise BuiltInExceptions.reader_invalid_float().create_with_context(self, number)
+        
+        if result != struct.unpack(">f", struct.pack(">f", result)):
+            self.cursor = start
+            raise BuiltInExceptions.reader_invalid_float().create_with_context(self, number)
+        return result
     
     def read_unquoted_string(self):
         start = self.cursor
