@@ -167,6 +167,7 @@ class StringReader:
             if escaped:
                 if char == terminator or char == self.SYNTAX_ESCAPE:
                     result += char
+                    escaped = False
                 else:
                     self.set_cursor(self.get_cursor() - 1)
                     raise BuiltInExceptions.reader_invalid_escape().create_with_context(self, str(char))
