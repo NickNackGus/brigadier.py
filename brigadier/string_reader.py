@@ -177,6 +177,10 @@ class StringReader:
                 elif char == '"':
                     result += '"'
                     escaped = False
+                elif char == 'u' and self.can_read(4):
+                    char_point = int(self.get_remaining()[:4], 16)
+                    char = chr(char_point)
+                    escaped = False
                 else:
                     self.set_cursor(self.get_cursor() - 1)
                     raise BuiltInExceptions.reader_invalid_escape().create_with_context(self, str(char))
