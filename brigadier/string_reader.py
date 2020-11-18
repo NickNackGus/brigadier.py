@@ -76,7 +76,11 @@ class StringReader:
             self.cursor = start
             raise BuiltInExceptions.reader_invalid_int().create_with_context(self, number)
 
-        if result != struct.unpack(">i", struct.pack(">i", result))[0]:
+        try:
+            if result != struct.unpack(">i", struct.pack(">i", result))[0]:
+                self.cursor = start
+                raise BuiltInExceptions.reader_invalid_int().create_with_context(self, number)
+        except struct.error:
             self.cursor = start
             raise BuiltInExceptions.reader_invalid_int().create_with_context(self, number)
         return result
@@ -96,7 +100,11 @@ class StringReader:
             self.cursor = start
             raise BuiltInExceptions.reader_invalid_long().create_with_context(self, number)
 
-        if result != struct.unpack(">q", struct.pack(">q", result))[0]:
+        try:
+            if result != struct.unpack(">q", struct.pack(">q", result))[0]:
+                self.cursor = start
+                raise BuiltInExceptions.reader_invalid_long().create_with_context(self, number)
+        except struct.error:
             self.cursor = start
             raise BuiltInExceptions.reader_invalid_long().create_with_context(self, number)
         return result
